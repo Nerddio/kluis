@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Kluis.UI\Kluis.UI.csproj" />
     <ProjectReference Include="..\Kluis.Core\Kluis.Core.csproj" />
+    <ProjectReference Include="..\Kluis.Data\Kluis.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>

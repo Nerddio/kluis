@@ -6,3 +6,34 @@ html, body {
 #blazor-error-ui {
     display: none;
 }
+
+.gate {
+    max-width: 28rem;
+    margin: 4rem auto;
+}
+
+.gate form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.gate input {
+    font: inherit;
+    padding: 0.4rem;
+}
+
+.gate button {
+    font: inherit;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+}
+
+.warning {
+    border-left: 4px solid #b45309;
+    padding-left: 0.75rem;
+}
+
+.error {
+    color: #b91c1c;
+}

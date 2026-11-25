@@ -38,3 +38,16 @@ Terms used in this project, appended as they come up.
 - **global.json** — a file pinning which .NET SDK version builds the repository.
 - **Dependabot version updates** — Dependabot opening pull requests to bump dependencies on a schedule, configured in `.github/dependabot.yml`; separate from its security alerts.
 - **Build artefact** — a file a pipeline produces and keeps after the job ends, such as test results now or the installer later.
+- **Encryption at rest** — data encrypted where it is stored, so a copied file is unreadable without the key.
+- **Key derivation function (KDF)** — deliberately slow maths that turns a passphrase into an encryption key, so each guess an attacker makes is expensive; Kluis uses PBKDF2-HMAC-SHA512 at 256,000 iterations.
+- **Salt** — random bytes stored with the encrypted file and fed into the KDF, so the same passphrase gives a different key for every file and precomputed guess tables are useless.
+- **HMAC (Hash-based Message Authentication Code)** — a keyed checksum; anyone changing the data without the key cannot produce a matching one, so tampering is detected.
+- **Authenticated encryption** — encryption that also detects tampering, here by an HMAC on every database page.
+- **SQL injection** — an attack where text supplied by a user is pasted into a SQL statement and changes what the statement does; prevented by parameters, or where those are impossible, by escaping.
+- **ORM (object-relational mapper)** — a library that maps classes in code to database tables; EF Core is .NET's standard one.
+- **Migration (database)** — a versioned, ordered script that changes the database schema; EF Core generates them from model changes and applies the pending ones on startup.
+- **Dependency injection (DI)** — classes receive the services they need (such as `IVault`) from a container instead of creating them, which is what lets a test hand in a fake.
+- **Test double** — any stand-in for a real dependency in a test. A fake is a working lightweight implementation (Kluis's `FakeVault`); a stub returns canned answers; a mock also checks how it was called; a spy records calls for later inspection.
+- **Arrange-act-assert** — the three-part layout of a test: set up, do the one thing under test, check the result.
+- **Regression test** — a test written for a specific bug so it cannot come back.
+- **Local tool (.NET)** — a command-line tool such as `dotnet-ef` pinned per repository in `dotnet-tools.json` and installed with `dotnet tool restore`.

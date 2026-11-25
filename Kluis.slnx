@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/Kluis.App/Kluis.App.csproj" />
     <Project Path="src/Kluis.Core/Kluis.Core.csproj" />
+    <Project Path="src/Kluis.Data/Kluis.Data.csproj" />
     <Project Path="src/Kluis.UI/Kluis.UI.csproj" />
   </Folder>
   <Folder Name="/tests/">
