@@ -51,3 +51,6 @@ Terms used in this project, appended as they come up.
 - **Arrange-act-assert** — the three-part layout of a test: set up, do the one thing under test, check the result.
 - **Regression test** — a test written for a specific bug so it cannot come back.
 - **Local tool (.NET)** — a command-line tool such as `dotnet-ef` pinned per repository in `dotnet-tools.json` and installed with `dotnet tool restore`.
+- **Forward-only migrations** — schema changes are only ever applied, never undone by the app; going back means restoring a backup taken before the change.
+- **Test clock (fake TimeProvider)** — a stand-in for the system clock frozen at a known instant, so code that depends on the time (such as a timestamped backup name) gives predictable results in tests.
+- **Mutation testing** — deliberately breaking the code under test (a "mutant") to check that the tests notice; a test that still passes against broken code verifies nothing.

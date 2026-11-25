@@ -52,6 +52,9 @@
                 case UnlockResult.NotFound:
                     _error = "The database file is no longer there. Restart Kluis to create a new one.";
                     break;
+                case UnlockResult.BackupFailed:
+                    _error = "This version of Kluis needs to upgrade your database, but could not back it up first, so it changed nothing. Check there is free disk space and try again.";
+                    break;
             }
         }
         catch (Exception)

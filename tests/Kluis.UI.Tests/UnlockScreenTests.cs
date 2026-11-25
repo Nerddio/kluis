@@ -64,6 +64,20 @@ public class UnlockScreenTests : BunitContext
     }
 
     [Fact]
+    public void A_failed_backup_before_an_upgrade_is_explained_and_does_not_unlock()
+    {
+        _vault.FailBackup = true;
+        var unlocked = false;
+        var cut = Render<UnlockScreen>(parameters => parameters.Add(p => p.OnUnlocked, () => unlocked = true));
+
+        cut.Find("#passphrase").Change(Passphrase);
+        cut.Find("form").Submit();
+
+        Assert.Contains("could not back it up first, so it changed nothing", cut.Find("[role=alert]").TextContent);
+        Assert.False(unlocked);
+    }
+
+    [Fact]
     public void An_unexpected_failure_shows_a_generic_message_that_leaks_no_details()
     {
         _vault.ThrowOnAccess = true;

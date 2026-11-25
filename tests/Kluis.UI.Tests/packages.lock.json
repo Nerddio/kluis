@@ -22,12 +22,6 @@
           "Microsoft.Extensions.Logging.Abstractions": "10.0.13"
         }
       },
-      "coverlet.collector": {
-        "type": "Direct",
-        "requested": "[10.1.1, )",
-        "resolved": "10.1.1",
-        "contentHash": "iRWGpNzKG6/pA0VzAt+WDzFAPMHvs/E4ZxeSYiEaAa7MzFhAcWcIWd7RDNLhCBenpSNdJCwm42UcQP4nGUbwJQ=="
-      },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
         "requested": "[18.12.0, )",
