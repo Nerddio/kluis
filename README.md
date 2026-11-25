@@ -10,6 +10,7 @@ Inspired by local-first budgeting tools.
 
 - Everything is stored in one encrypted database file, `%LOCALAPPDATA%\Kluis\kluis.db`, protected by a passphrase you choose (at least 12 characters). The folder is deliberately not Documents or the Desktop, which cloud backup tools such as OneDrive commonly sync off the machine.
 - The file uses the SQLCipher 4 format through SQLite3 Multiple Ciphers: AES-256 encryption with a tamper check on every page, and a key derived from your passphrase with PBKDF2-HMAC-SHA512 at 256,000 iterations.
+- When a new version of Kluis needs to upgrade the database, it first copies it to `kluis-<UTC time>-before-migration.kluisbackup` in the same folder, encrypted with the same passphrase. If that copy fails, the upgrade does not run. Upgrades only move forward, so to go back to an older version of Kluis, restore the backup taken before the upgrade by renaming it to `kluis.db`.
 - There is no server, no account, no cloud sync and no telemetry. The app makes no network calls at all.
 - There is deliberately no passphrase recovery. If you forget it, the data cannot be opened, and encrypted backups use the same passphrase.
 - No AI is involved: every categorisation and every flag is plain, testable code.

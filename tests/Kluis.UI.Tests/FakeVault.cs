@@ -12,6 +12,8 @@ public sealed class FakeVault : IVault
 
     public bool ThrowOnAccess { get; set; }
 
+    public bool FailBackup { get; set; }
+
     public bool Exists => StoredPassphrase is not null;
 
     public bool IsUnlocked { get; private set; }
@@ -42,6 +44,11 @@ public sealed class FakeVault : IVault
         if (StoredPassphrase is null)
         {
             return Task.FromResult(UnlockResult.NotFound);
+        }
+
+        if (FailBackup && passphrase == StoredPassphrase)
+        {
+            return Task.FromResult(UnlockResult.BackupFailed);
         }
 
         IsUnlocked = passphrase == StoredPassphrase;
