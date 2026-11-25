@@ -54,3 +54,4 @@ Terms used in this project, appended as they come up.
 - **Forward-only migrations** — schema changes are only ever applied, never undone by the app; going back means restoring a backup taken before the change.
 - **Test clock (fake TimeProvider)** — a stand-in for the system clock frozen at a known instant, so code that depends on the time (such as a timestamped backup name) gives predictable results in tests.
 - **Mutation testing** — deliberately breaking the code under test (a "mutant") to check that the tests notice; a test that still passes against broken code verifies nothing.
+- **Squash merge** — merging a pull request by combining all its commits into one new commit on `main`, titled with the pull request title and number, so `main` holds exactly one commit per ticket.
