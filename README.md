@@ -1,5 +1,7 @@
 # Kluis
 
+[![CI](https://github.com/Nerddio/kluis/actions/workflows/ci.yml/badge.svg)](https://github.com/Nerddio/kluis/actions/workflows/ci.yml)
+
 Kluis (Dutch for "safe" or "vault") is a private, local-first personal finance app for Windows. You import your bank statements, Kluis categorises every transaction by keyword rules you control, and dashboards show your income, spending and savings over any period, compared against a salary history you enter yourself.
 
 Inspired by local-first budgeting tools.
@@ -34,6 +36,8 @@ dotnet run --project src/Kluis.App
 | `tests/Kluis.Core.Tests` | Unit tests (xUnit) |
 | `tests/Kluis.IntegrationTests` | Integration tests against a real encrypted database file (xUnit) |
 | `tests/Kluis.UI.Tests` | Component tests (bUnit) |
+
+The same checks run in GitHub Actions on every pull request and on every push to `main` (`.github/workflows/ci.yml`, job `build-and-test`). `global.json` pins the SDK feature band so CI and local builds use the same compiler, and restores run in locked mode against the committed `packages.lock.json` files.
 
 ## Install
 

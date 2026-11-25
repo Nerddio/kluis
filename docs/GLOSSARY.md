@@ -26,3 +26,15 @@ Terms used in this project, appended as they come up.
 - **.editorconfig** — a file declaring formatting rules (indentation, line endings) that editors and `dotnet format` follow.
 - **Line endings (CRLF versus LF)** — Windows ends text lines with two characters (carriage return and line feed), Linux and macOS with one; `.gitattributes` controls the conversion git does on checkout.
 - **Chrome DevTools Protocol (CDP)** — the remote-control interface of Chromium-based browsers, including WebView2; Playwright uses it to drive the app in end-to-end tests.
+- **Supply-chain attack** — compromising software by tampering with something it depends on or is delivered through (a package, a build action, a release file) rather than attacking the software itself.
+- **Pipeline** — the automated sequence that builds, tests and (later) packages the code whenever something changes; in GitHub Actions it is defined by a workflow file.
+- **Workflow (GitHub Actions)** — a YAML file in `.github/workflows/` that says when the pipeline runs (its triggers) and what it does.
+- **Job** — one unit of a workflow that runs on its own machine; `build-and-test` is a job, and its name is what a required status check refers to.
+- **Step** — one command or action inside a job, run in order.
+- **Runner** — the machine that executes a job; `windows-2025` is a GitHub-hosted Windows virtual machine, free for public repositories.
+- **Status check** — the pass or fail result a job reports on a pull request; branch protection can require it before merging.
+- **SHA pinning** — referring to a third-party action by its full commit hash instead of a tag such as `v7`, because a tag can be moved to different code by whoever controls it, while a commit hash cannot.
+- **Locked mode (NuGet)** — a restore that fails if the resolved package versions differ from the committed `packages.lock.json`, so CI never silently picks up a different dependency.
+- **global.json** — a file pinning which .NET SDK version builds the repository.
+- **Dependabot version updates** — Dependabot opening pull requests to bump dependencies on a schedule, configured in `.github/dependabot.yml`; separate from its security alerts.
+- **Build artefact** — a file a pipeline produces and keeps after the job ends, such as test results now or the installer later.
