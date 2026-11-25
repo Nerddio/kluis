@@ -13,16 +13,27 @@ Inspired by local-first budgeting tools.
 
 ## Status
 
-Under construction. The solution scaffold, the build pipeline and the first installable pre-release arrive in milestone M1 · Foundations. Until then there is nothing to build or install.
+Under construction. The solution builds and shows a placeholder window; the encrypted database, the build pipeline and the first installable pre-release arrive in milestone M1 · Foundations.
 
 ## Build and test
 
-Requires Windows and the .NET SDK. Once the solution exists (M1):
+Requires Windows 10 version 1809 or later, the .NET 10 SDK, and the WebView2 runtime (included with current Windows).
 
 ```
 dotnet build
 dotnet test
+dotnet format --verify-no-changes
+dotnet run --project src/Kluis.App
 ```
+
+| Project | What it holds |
+| --- | --- |
+| `src/Kluis.App` | The WPF window that hosts the UI in a BlazorWebView |
+| `src/Kluis.UI` | Razor components: every screen of the app |
+| `src/Kluis.Core` | Domain logic with no UI dependency |
+| `tests/Kluis.Core.Tests` | Unit tests (xUnit) |
+| `tests/Kluis.IntegrationTests` | Integration tests against a real encrypted database file (xUnit) |
+| `tests/Kluis.UI.Tests` | Component tests (bUnit) |
 
 ## Install
 
