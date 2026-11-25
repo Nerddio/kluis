@@ -1,0 +1,8 @@
+html, body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+#blazor-error-ui {
+    display: none;
+}

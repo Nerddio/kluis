@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Kluis.App/Kluis.App.csproj" />
+    <Project Path="src/Kluis.Core/Kluis.Core.csproj" />
+    <Project Path="src/Kluis.UI/Kluis.UI.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Kluis.Core.Tests/Kluis.Core.Tests.csproj" />
+    <Project Path="tests/Kluis.IntegrationTests/Kluis.IntegrationTests.csproj" />
+    <Project Path="tests/Kluis.UI.Tests/Kluis.UI.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,4 @@
+# Store text with LF in the repository and check it out with CRLF, matching the Windows-only toolchain.
+* text=auto eol=crlf
+*.png binary
+*.ico binary
