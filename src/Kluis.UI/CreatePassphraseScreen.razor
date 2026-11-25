@@ -1,0 +1,70 @@
+@using Kluis.Core.Vault
+@inject IVault Vault
+
+<main class="gate">
+    <h1>Welcome to Kluis</h1>
+    <p>Choose a passphrase. It encrypts everything Kluis stores on this computer.</p>
+    <p class="warning" role="note">
+        There is no way to recover a forgotten passphrase. If you lose it, your data cannot be opened.
+    </p>
+
+    <form @onsubmit="CreateAsync">
+        <label for="passphrase">Passphrase (at least @PassphrasePolicy.MinimumLength characters)</label>
+        <input id="passphrase" type="password" autocomplete="new-password" autofocus
+               @bind="_passphrase" disabled="@_busy" />
+
+        <label for="confirmation">Type it again</label>
+        <input id="confirmation" type="password" autocomplete="new-password"
+               @bind="_confirmation" disabled="@_busy" />
+
+        @if (_error is not null)
+        {
+            <p class="error" role="alert">@_error</p>
+        }
+
+        <button type="submit" disabled="@_busy">@(_busy ? "Creating…" : "Create encrypted database")</button>
+    </form>
+</main>
+
+@code {
+    private string _passphrase = "";
+    private string _confirmation = "";
+    private string? _error;
+    private bool _busy;
+
+    [Parameter]
+    public EventCallback OnCreated { get; set; }
+
+    private async Task CreateAsync()
+    {
+        _error = PassphrasePolicy.Validate(_passphrase, _confirmation) switch
+        {
+            PassphraseProblem.Empty => "Enter a passphrase.",
+            PassphraseProblem.TooShort => $"Use at least {PassphrasePolicy.MinimumLength} characters.",
+            PassphraseProblem.Mismatch => "The two passphrases do not match.",
+            _ => null,
+        };
+        if (_error is not null)
+        {
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            await Vault.CreateAsync(_passphrase);
+            _passphrase = "";
+            _confirmation = "";
+            await OnCreated.InvokeAsync();
+        }
+        catch (Exception)
+        {
+            // Deliberately no details: an exception message could carry a file path or data.
+            _error = "Kluis could not create the database.";
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

@@ -1,0 +1,67 @@
+@using Kluis.Core.Vault
+@inject IVault Vault
+
+<main class="gate">
+    <h1>Unlock Kluis</h1>
+
+    <form @onsubmit="UnlockAsync">
+        <label for="passphrase">Passphrase</label>
+        <input id="passphrase" type="password" autocomplete="current-password" autofocus
+               @bind="_passphrase" disabled="@_busy" />
+
+        @if (_error is not null)
+        {
+            <p class="error" role="alert">@_error</p>
+        }
+
+        <button type="submit" disabled="@_busy">@(_busy ? "Unlocking…" : "Unlock")</button>
+    </form>
+</main>
+
+@code {
+    private string _passphrase = "";
+    private string? _error;
+    private bool _busy;
+
+    [Parameter]
+    public EventCallback OnUnlocked { get; set; }
+
+    private async Task UnlockAsync()
+    {
+        _error = null;
+        if (string.IsNullOrEmpty(_passphrase))
+        {
+            _error = "Enter your passphrase.";
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            var result = await Vault.UnlockAsync(_passphrase);
+            switch (result)
+            {
+                case UnlockResult.Unlocked:
+                    _passphrase = "";
+                    await OnUnlocked.InvokeAsync();
+                    break;
+                case UnlockResult.WrongPassphrase:
+                    _passphrase = "";
+                    _error = "That passphrase did not unlock the database.";
+                    break;
+                case UnlockResult.NotFound:
+                    _error = "The database file is no longer there. Restart Kluis to create a new one.";
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+            // Deliberately no details: an exception message could carry a file path or data.
+            _error = "Kluis could not open the database.";
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

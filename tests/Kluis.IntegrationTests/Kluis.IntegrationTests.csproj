@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Kluis.Core\Kluis.Core.csproj" />
+    <ProjectReference Include="..\..\src\Kluis.Data\Kluis.Data.csproj" />
   </ItemGroup>
 
 </Project>

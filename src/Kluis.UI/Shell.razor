@@ -1,0 +1,16 @@
+@using Kluis.Core.Vault
+@inject IVault Vault
+
+@* The root component: decides between first-run setup, unlock and the app itself. *@
+@if (Vault.IsUnlocked)
+{
+    <Home />
+}
+else if (Vault.Exists)
+{
+    <UnlockScreen OnUnlocked="StateHasChanged" />
+}
+else
+{
+    <CreatePassphraseScreen OnCreated="StateHasChanged" />
+}
