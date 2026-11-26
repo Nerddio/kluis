@@ -12,6 +12,12 @@
           "Microsoft.Web.WebView2": "1.0.4314.35"
         }
       },
+      "Velopack": {
+        "type": "Direct",
+        "requested": "[1.2.161, )",
+        "resolved": "1.2.161",
+        "contentHash": "OpHNacIumnkhaaX3ZlQ/TCR4YPOJvud2/PAOoWb6o+mIrLwIVA275I5wAgt4q/1O2VrJeDwR1qFQyqzG4lUArg=="
+      },
       "Microsoft.AspNetCore.Authorization": {
         "type": "Transitive",
         "resolved": "10.0.15",
@@ -383,6 +389,18 @@
           "Kluis.Core": "[1.0.0, )",
           "Microsoft.AspNetCore.Components.Web": "[10.0.15, )"
         }
+      }
+    },
+    "net10.0-windows10.0.17763/win-x64": {
+      "Microsoft.Web.WebView2": {
+        "type": "Transitive",
+        "resolved": "1.0.4314.35",
+        "contentHash": "x5MFf2W03xueU1mMNvivXfHSsQ+ODo7vJ36qw/dLtU5Gs+8d7+7N7zzmNNDoT3ffosmcvZNBtUnlzyiDUuBkSQ=="
+      },
+      "SQLite3MC.PCLRaw.lib": {
+        "type": "Transitive",
+        "resolved": "2.7.1",
+        "contentHash": "2qAVDsPXpkjnyWed+WXpCGhL/0Jryx900B7J7ikGTWWZ5YGFGGig0JHz5N8SAB9/7Al+9hmzUU1ivAQxMIU/3A=="
       }
     }
   }

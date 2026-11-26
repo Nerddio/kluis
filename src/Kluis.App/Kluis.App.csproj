@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="10.0.130" />
+    <PackageReference Include="Velopack" Version="1.2.161" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -16,6 +17,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <!-- Program.Main runs the Velopack hooks before WPF starts; without this WPF generates its own Main. -->
+    <StartupObject>Kluis.App.Program</StartupObject>
+    <!-- Declared so packages.lock.json also covers the self-contained win-x64 publish used by the installer. -->
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
 </Project>

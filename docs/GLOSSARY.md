@@ -66,3 +66,15 @@ Terms used in this project, appended as they come up.
 - **Test pyramid** — the guideline to have many fast unit tests, fewer integration tests and only a few slow end-to-end tests; the testing trophy variant weights integration tests most heavily.
 - **Authenticode signature** — Windows code signing: a publisher signs an executable with a certificate, and Windows can verify who signed it and that it has not been changed since.
 - **WebView2 runtime** — the Windows component that BlazorWebView renders with; it ships with Windows 11 and is installed separately from the Edge browser.
+- **Continuous Delivery** — every merge produces a tested, deployable artefact, and a human decides when it ships. Kluis uses this: a version tag and publishing a draft release are the human steps.
+- **Continuous Deployment** — every merge that passes the pipeline ships to users automatically, with no human step. Kluis deliberately does not, because a release reaches other people's machines and their data.
+- **Build once, deploy that** — the artefact that was tested is the one that ships; rebuilding on the way out produces a different artefact the tests never saw.
+- **Semantic versioning (SemVer)** — versions written MAJOR.MINOR.PATCH, where a major bump signals a breaking change, a minor bump new features and a patch bump fixes; a suffix such as `-beta.1` marks a pre-release.
+- **Git tag** — a fixed name attached to one commit, such as `v0.1.0`; pushing one is what starts a Kluis release.
+- **Draft release (GitHub)** — a release with its files attached that is invisible to the public until someone publishes it.
+- **Pre-release (GitHub)** — a published release flagged as not production-ready, so it is not shown as the latest version.
+- **Rollback** — returning users to the last good version after a bad release; for Kluis, marking the bad release as a pre-release and reinstalling the previous installer.
+- **Self-contained deployment** — publishing a .NET app together with the .NET runtime, so users do not need .NET installed; larger download, no prerequisites.
+- **Velopack** — the installer and packaging tool Kluis uses; `vpk pack` turns the published app into a per-user Windows installer.
+- **Code signing** — cryptographically stamping an installer with the publisher's verified identity so Windows can confirm where it came from; without it, SmartScreen warns.
+- **SmartScreen** — the Windows feature that warns before running downloaded programs that are unsigned or not yet widely downloaded.

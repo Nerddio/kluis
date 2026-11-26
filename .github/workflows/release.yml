@@ -1,0 +1,98 @@
+name: Release
+
+# Continuous Delivery: every push to main produces a tested installer as a build artefact.
+# Publishing is a human decision: push a version tag (v1.2.3), check the draft release, then publish it.
+on:
+  push:
+    branches: [main]
+    tags: ['v*.*.*']
+
+# Read-only by default. Only the release job may write, and only to create the release.
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  package:
+    runs-on: windows-2025
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+
+      - name: Work out the version
+        id: version
+        shell: pwsh
+        run: |
+          if ('${{ github.ref_type }}' -eq 'tag') {
+            $version = '${{ github.ref_name }}'.Substring(1)
+            if ($version -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$') { throw "Tag '${{ github.ref_name }}' is not v + a semantic version." }
+          } else {
+            $version = "0.0.0-ci.${{ github.run_number }}"
+          }
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "Packaging version $version"
+
+      - name: Restore (locked)
+        run: dotnet restore --locked-mode
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      # The same gate as CI, repeated here because a tag push does not run the CI workflow.
+      - name: Unit, component and integration tests
+        run: dotnet test --configuration Release --no-build --filter "Category!=E2E"
+
+      - name: Publish and pack the installer
+        shell: pwsh
+        run: ./build/package.ps1 -Version '${{ steps.version.outputs.version }}'
+
+      - name: Upload installer
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: installer-${{ steps.version.outputs.version }}
+          path: Releases
+          retention-days: 30
+          if-no-files-found: error
+
+  release:
+    if: github.ref_type == 'tag'
+    needs: package
+    runs-on: windows-2025
+    timeout-minutes: 10
+    permissions:
+      # The only write permission in any workflow: creating the release and attaching its files.
+      contents: write
+    steps:
+      # Exactly the files the package job built and uploaded. Nothing is rebuilt between the
+      # artefact that was tested and the one that is published.
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: installer-${{ needs.package.outputs.version }}
+          path: Releases
+
+      # A draft, so it reaches no one until the end-to-end smoke test has passed on a real desktop
+      # against this exact installer (it cannot run on the hosted runner) and it is published by hand.
+      - name: Create draft release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.package.outputs.version }}
+        run: |
+          $flags = @('--draft', '--verify-tag')
+          if ($env:VERSION.StartsWith('0.') -or $env:VERSION.Contains('-')) { $flags += '--prerelease' }
+          gh release create '${{ github.ref_name }}' (Get-ChildItem Releases).FullName `
+            --repo '${{ github.repository }}' `
+            --title "Kluis $env:VERSION" `
+            --notes 'Windows installer: download KluisApp-win-Setup.exe. It is not code-signed, so Windows SmartScreen will warn on first run. See the README for what the installer does and where your data lives.' `
+            @flags
