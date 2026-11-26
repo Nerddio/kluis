@@ -64,3 +64,5 @@ Terms used in this project, appended as they come up.
 - **Flaky test** — a test that sometimes passes and sometimes fails on the same code, usually because of timing; end-to-end tests are the most prone to it, which is why Playwright waits for conditions instead of fixed delays.
 - **Test trait (xUnit)** — a label on a test, such as `Category=E2E`, that a test run can filter on.
 - **Test pyramid** — the guideline to have many fast unit tests, fewer integration tests and only a few slow end-to-end tests; the testing trophy variant weights integration tests most heavily.
+- **Authenticode signature** — Windows code signing: a publisher signs an executable with a certificate, and Windows can verify who signed it and that it has not been changed since.
+- **WebView2 runtime** — the Windows component that BlazorWebView renders with; it ships with Windows 11 but is separate from the Edge browser and absent from some server images.
