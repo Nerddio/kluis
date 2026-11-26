@@ -37,3 +37,20 @@ html, body {
 .error {
     color: #b91c1c;
 }
+
+.remember label {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.hint {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 0.25rem 0 0;
+}
+
+.settings {
+    margin-top: 2rem;
+    max-width: 40rem;
+}

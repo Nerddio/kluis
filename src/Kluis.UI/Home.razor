@@ -1,4 +1,25 @@
+@using Kluis.Core.Vault
+@inject IVault Vault
+
 <main>
     <h1>Kluis</h1>
     <p>Your finances, on your machine only.</p>
+
+    <section class="settings" aria-labelledby="settings-heading">
+        <h2 id="settings-heading">This PC</h2>
+        @if (Vault.IsRemembered)
+        {
+            <p>Remember on this PC is <strong>on</strong>. Kluis unlocks without asking for the passphrase.</p>
+            <p class="hint">@RememberText.Warning</p>
+            <button id="forget" type="button" @onclick="Forget">Turn off and forget the passphrase</button>
+        }
+        else
+        {
+            <p>Remember on this PC is <strong>off</strong>. Kluis asks for the passphrase every time it starts. To turn it on, tick "Remember on this PC" the next time you unlock.</p>
+        }
+    </section>
 </main>
+
+@code {
+    private void Forget() => Vault.Forget();
+}

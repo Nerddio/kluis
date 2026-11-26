@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net10.0": {
+    "net10.0-windows7.0": {
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
         "requested": "[18.12.0, )",
@@ -206,6 +206,11 @@
         "resolved": "3.0.2",
         "contentHash": "tnbRf0muOOSJK1RLCfyYK13jynFScgL4xMj7yC3oy8lrrGKXTKmOoWjfdV+cFfBRdppm4qST31hvp8ihgIgvMQ=="
       },
+      "System.Security.Cryptography.ProtectedData": {
+        "type": "Transitive",
+        "resolved": "10.0.15",
+        "contentHash": "AG49oTxB0R4YQJzeIIHRgqyaI3SOT8Q8vEfGUcju2WxOvsBkDJU4FKTQ8gYQAYCxmHOHqyJL0UDGcCf8nzRoiw=="
+      },
       "xunit.abstractions": {
         "type": "Transitive",
         "resolved": "2.0.3",
@@ -254,7 +259,8 @@
         "dependencies": {
           "Kluis.Core": "[1.0.0, )",
           "Microsoft.EntityFrameworkCore.Sqlite.Core": "[10.0.15, )",
-          "SQLite3MC.PCLRaw.bundle": "[2.7.1, )"
+          "SQLite3MC.PCLRaw.bundle": "[2.7.1, )",
+          "System.Security.Cryptography.ProtectedData": "[10.0.15, )"
         }
       }
     }

@@ -13,6 +13,7 @@ public sealed class SqliteVault(string databasePath, TimeProvider? timeProvider 
     public const string BackupExtension = ".kluisbackup";
 
     private readonly TimeProvider _time = timeProvider ?? TimeProvider.System;
+    private readonly RememberedPassphrase _remembered = RememberedPassphrase.For(databasePath);
     private SqliteConnection? _connection;
 
     /// <summary>
@@ -28,7 +29,9 @@ public sealed class SqliteVault(string databasePath, TimeProvider? timeProvider 
 
     public bool IsUnlocked => _connection is not null;
 
-    public async Task CreateAsync(string passphrase, CancellationToken cancellationToken = default)
+    public bool IsRemembered => _remembered.Exists;
+
+    public async Task CreateAsync(string passphrase, bool remember = false, CancellationToken cancellationToken = default)
     {
         if (Exists)
         {
@@ -38,9 +41,10 @@ public sealed class SqliteVault(string databasePath, TimeProvider? timeProvider 
         var connection = EncryptedConnection.Create(DatabasePath, passphrase);
         await MigrateAsync(connection, cancellationToken);
         Replace(connection);
+        ApplyRememberChoice(passphrase, remember);
     }
 
-    public async Task<UnlockResult> UnlockAsync(string passphrase, CancellationToken cancellationToken = default)
+    public async Task<UnlockResult> UnlockAsync(string passphrase, bool remember = false, CancellationToken cancellationToken = default)
     {
         if (!Exists)
         {
@@ -62,7 +66,46 @@ public sealed class SqliteVault(string databasePath, TimeProvider? timeProvider 
 
         await MigrateAsync(connection, cancellationToken);
         Replace(connection);
+        if (remember)
+        {
+            _remembered.Save(passphrase);
+        }
+
         return UnlockResult.Unlocked;
+    }
+
+    public async Task<UnlockResult> UnlockWithRememberedAsync(CancellationToken cancellationToken = default)
+    {
+        var passphrase = _remembered.TryLoad();
+        if (passphrase is null)
+        {
+            // Unreadable (another Windows user, a copied file, corruption) is as good as absent.
+            _remembered.Delete();
+            return UnlockResult.NotRemembered;
+        }
+
+        var result = await UnlockAsync(passphrase, remember: false, cancellationToken);
+        if (result == UnlockResult.WrongPassphrase)
+        {
+            // The database was replaced or its passphrase changed: the stored secret is useless now.
+            _remembered.Delete();
+        }
+
+        return result;
+    }
+
+    public void Forget() => _remembered.Delete();
+
+    private void ApplyRememberChoice(string passphrase, bool remember)
+    {
+        if (remember)
+        {
+            _remembered.Save(passphrase);
+        }
+        else
+        {
+            _remembered.Delete();
+        }
     }
 
     /// <summary>

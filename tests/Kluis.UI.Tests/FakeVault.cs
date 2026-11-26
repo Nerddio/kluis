@@ -4,11 +4,13 @@ namespace Kluis.UI.Tests;
 
 /// <summary>
 /// A fake: a working, in-memory stand-in for the real encrypted vault, so component tests exercise
-/// the screens without touching disk. The real vault is covered by the integration tests.
+/// the screens without touching disk or DPAPI. The real vault is covered by the integration tests.
 /// </summary>
 public sealed class FakeVault : IVault
 {
     public string? StoredPassphrase { get; set; }
+
+    public string? RememberedPassphrase { get; set; }
 
     public bool ThrowOnAccess { get; set; }
 
@@ -18,24 +20,27 @@ public sealed class FakeVault : IVault
 
     public bool IsUnlocked { get; private set; }
 
-    public List<string> Attempts { get; } = [];
+    public bool IsRemembered => RememberedPassphrase is not null;
 
-    public Task CreateAsync(string passphrase, CancellationToken cancellationToken = default)
+    public List<(string Passphrase, bool Remember)> Attempts { get; } = [];
+
+    public Task CreateAsync(string passphrase, bool remember = false, CancellationToken cancellationToken = default)
     {
-        Attempts.Add(passphrase);
+        Attempts.Add((passphrase, remember));
         if (ThrowOnAccess)
         {
             throw new IOException(@"C:\secret\path\kluis.db is locked");
         }
 
         StoredPassphrase = passphrase;
+        RememberedPassphrase = remember ? passphrase : null;
         IsUnlocked = true;
         return Task.CompletedTask;
     }
 
-    public Task<UnlockResult> UnlockAsync(string passphrase, CancellationToken cancellationToken = default)
+    public Task<UnlockResult> UnlockAsync(string passphrase, bool remember = false, CancellationToken cancellationToken = default)
     {
-        Attempts.Add(passphrase);
+        Attempts.Add((passphrase, remember));
         if (ThrowOnAccess)
         {
             throw new IOException(@"C:\secret\path\kluis.db is locked");
@@ -52,6 +57,29 @@ public sealed class FakeVault : IVault
         }
 
         IsUnlocked = passphrase == StoredPassphrase;
+        if (IsUnlocked && remember)
+        {
+            RememberedPassphrase = passphrase;
+        }
+
         return Task.FromResult(IsUnlocked ? UnlockResult.Unlocked : UnlockResult.WrongPassphrase);
     }
+
+    public async Task<UnlockResult> UnlockWithRememberedAsync(CancellationToken cancellationToken = default)
+    {
+        if (RememberedPassphrase is null)
+        {
+            return UnlockResult.NotRemembered;
+        }
+
+        var result = await UnlockAsync(RememberedPassphrase, cancellationToken: cancellationToken);
+        if (result == UnlockResult.WrongPassphrase)
+        {
+            RememberedPassphrase = null;
+        }
+
+        return result;
+    }
+
+    public void Forget() => RememberedPassphrase = null;
 }
