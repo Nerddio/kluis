@@ -49,8 +49,11 @@ dotnet ef migrations add <Name> --project src/Kluis.Data --output-dir Migrations
 | `tests/Kluis.Core.Tests` | Unit tests (xUnit) |
 | `tests/Kluis.IntegrationTests` | Integration tests against a real encrypted database file (xUnit) |
 | `tests/Kluis.UI.Tests` | Component tests (bUnit) |
+| `tests/Kluis.EndToEndTests` | End-to-end smoke tests (Playwright for .NET) that launch the real app window against a throwaway database |
 
-The same checks run in GitHub Actions on every pull request and on every push to `main` (`.github/workflows/ci.yml`, job `build-and-test`). `global.json` pins the SDK feature band so CI and local builds use the same compiler, and restores run in locked mode against the committed `packages.lock.json` files.
+`dotnet test` runs everything, including the end-to-end tests, which open and close the app window a few times. To skip them, add `--filter "Category!=E2E"`; to run only them, `--filter "Category=E2E"`. They attach to the WebView2 inside the app through a local debugging port, so no browser needs installing.
+
+The same checks run in GitHub Actions on every pull request and on every push to `main` (`.github/workflows/ci.yml`): job `build-and-test` runs everything except the end-to-end tests, and job `e2e` runs those on a GitHub-hosted Windows runner. `global.json` pins the SDK feature band so CI and local builds use the same compiler, and restores run in locked mode against the committed `packages.lock.json` files.
 
 ## Install
 
