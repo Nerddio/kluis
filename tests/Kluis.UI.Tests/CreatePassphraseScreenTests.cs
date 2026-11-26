@@ -57,7 +57,7 @@ public class CreatePassphraseScreenTests : BunitContext
         cut.Find("#confirmation").Change("correct horse battery staple");
         cut.Find("form").Submit();
 
-        Assert.Equal(["correct horse battery staple"], _vault.Attempts);
+        Assert.Equal([("correct horse battery staple", false)], _vault.Attempts);
         Assert.True(created);
     }
 

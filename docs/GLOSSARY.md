@@ -54,3 +54,7 @@ Terms used in this project, appended as they come up.
 - **Forward-only migrations** — schema changes are only ever applied, never undone by the app; going back means restoring a backup taken before the change.
 - **Test clock (fake TimeProvider)** — a stand-in for the system clock frozen at a known instant, so code that depends on the time (such as a timestamped backup name) gives predictable results in tests.
 - **Mutation testing** — deliberately breaking the code under test (a "mutant") to check that the tests notice; a test that still passes against broken code verifies nothing.
+- **Squash merge** — merging a pull request by combining all its commits into one new commit on `main`, titled with the pull request title and number, so `main` holds exactly one commit per ticket.
+- **DPAPI (Data Protection API)** — a Windows service that encrypts data with a key tied to the Windows user account (CurrentUser scope) or the machine, so an application can store a secret without managing a key itself.
+- **DPAPI optional entropy** — extra bytes an application mixes into DPAPI encryption; another program running as the same user must also supply them to decrypt, which stops generic decrypt-everything tools but is not a secret.
+- **Threat model** — who realistically might attack a system and what they would want; it decides which defences are worth their cost.

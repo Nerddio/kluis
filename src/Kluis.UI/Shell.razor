@@ -2,15 +2,42 @@
 @inject IVault Vault
 
 @* The root component: decides between first-run setup, unlock and the app itself. *@
-@if (Vault.IsUnlocked)
+@if (!_ready)
+{
+    <p class="gate">Opening…</p>
+}
+else if (Vault.IsUnlocked)
 {
     <Home />
 }
 else if (Vault.Exists)
 {
-    <UnlockScreen OnUnlocked="StateHasChanged" />
+    <UnlockScreen OnUnlocked="StateHasChanged" RememberedUnlockResult="_rememberedResult" />
 }
 else
 {
     <CreatePassphraseScreen OnCreated="StateHasChanged" />
+}
+
+@code {
+    private bool _ready;
+    private UnlockResult? _rememberedResult;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Vault.Exists && Vault.IsRemembered && !Vault.IsUnlocked)
+        {
+            try
+            {
+                _rememberedResult = await Vault.UnlockWithRememberedAsync();
+            }
+            catch (Exception)
+            {
+                // Fall back to asking for the passphrase; no details shown or kept.
+                _rememberedResult = null;
+            }
+        }
+
+        _ready = true;
+    }
 }

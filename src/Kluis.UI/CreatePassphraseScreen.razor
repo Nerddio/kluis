@@ -17,6 +17,8 @@
         <input id="confirmation" type="password" autocomplete="new-password"
                @bind="_confirmation" disabled="@_busy" />
 
+        <RememberOption @bind-Value="_remember" Disabled="_busy" />
+
         @if (_error is not null)
         {
             <p class="error" role="alert">@_error</p>
@@ -29,6 +31,7 @@
 @code {
     private string _passphrase = "";
     private string _confirmation = "";
+    private bool _remember;
     private string? _error;
     private bool _busy;
 
@@ -52,7 +55,7 @@
         _busy = true;
         try
         {
-            await Vault.CreateAsync(_passphrase);
+            await Vault.CreateAsync(_passphrase, _remember);
             _passphrase = "";
             _confirmation = "";
             await OnCreated.InvokeAsync();

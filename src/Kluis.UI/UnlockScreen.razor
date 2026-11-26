@@ -9,6 +9,8 @@
         <input id="passphrase" type="password" autocomplete="current-password" autofocus
                @bind="_passphrase" disabled="@_busy" />
 
+        <RememberOption @bind-Value="_remember" Disabled="_busy" />
+
         @if (_error is not null)
         {
             <p class="error" role="alert">@_error</p>
@@ -20,11 +22,26 @@
 
 @code {
     private string _passphrase = "";
+    private bool _remember;
     private string? _error;
     private bool _busy;
 
     [Parameter]
     public EventCallback OnUnlocked { get; set; }
+
+    /// <summary>The outcome of an automatic unlock with a remembered passphrase that did not succeed, if any.</summary>
+    [Parameter]
+    public UnlockResult? RememberedUnlockResult { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _error = RememberedUnlockResult switch
+        {
+            UnlockResult.WrongPassphrase => "The passphrase remembered on this PC no longer unlocks the database, so it was removed. Enter your passphrase.",
+            UnlockResult.BackupFailed => MessageFor(UnlockResult.BackupFailed),
+            _ => null,
+        };
+    }
 
     private async Task UnlockAsync()
     {
@@ -38,23 +55,16 @@
         _busy = true;
         try
         {
-            var result = await Vault.UnlockAsync(_passphrase);
-            switch (result)
+            var result = await Vault.UnlockAsync(_passphrase, _remember);
+            if (result is UnlockResult.Unlocked or UnlockResult.WrongPassphrase)
             {
-                case UnlockResult.Unlocked:
-                    _passphrase = "";
-                    await OnUnlocked.InvokeAsync();
-                    break;
-                case UnlockResult.WrongPassphrase:
-                    _passphrase = "";
-                    _error = "That passphrase did not unlock the database.";
-                    break;
-                case UnlockResult.NotFound:
-                    _error = "The database file is no longer there. Restart Kluis to create a new one.";
-                    break;
-                case UnlockResult.BackupFailed:
-                    _error = "This version of Kluis needs to upgrade your database, but could not back it up first, so it changed nothing. Check there is free disk space and try again.";
-                    break;
+                _passphrase = "";
+            }
+
+            _error = MessageFor(result);
+            if (result == UnlockResult.Unlocked)
+            {
+                await OnUnlocked.InvokeAsync();
             }
         }
         catch (Exception)
@@ -67,4 +77,13 @@
             _busy = false;
         }
     }
+
+    private static string? MessageFor(UnlockResult result) => result switch
+    {
+        UnlockResult.Unlocked => null,
+        UnlockResult.WrongPassphrase => "That passphrase did not unlock the database.",
+        UnlockResult.NotFound => "The database file is no longer there. Restart Kluis to create a new one.",
+        UnlockResult.BackupFailed => "This version of Kluis needs to upgrade your database, but could not back it up first, so it changed nothing. Check there is free disk space and try again.",
+        _ => "Kluis could not open the database.",
+    };
 }
