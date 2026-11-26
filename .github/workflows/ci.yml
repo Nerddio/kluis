@@ -63,6 +63,24 @@ jobs:
         with:
           global-json-file: global.json
 
+      # The runner image ships Microsoft Edge but not the separate WebView2 runtime that BlazorWebView
+      # needs. Install Microsoft's Evergreen bootstrapper, refusing to run it unless it carries a valid
+      # Microsoft Authenticode signature: the download URL is not pinned, so the signature is the check.
+      - name: Install WebView2 runtime
+        shell: pwsh
+        run: |
+          $key = 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}'
+          if (Test-Path $key) { "WebView2 runtime already present: $((Get-ItemProperty $key).pv)"; exit 0 }
+          $installer = Join-Path $env:RUNNER_TEMP 'MicrosoftEdgeWebView2Setup.exe'
+          Invoke-WebRequest 'https://go.microsoft.com/fwlink/p/?LinkId=2124703' -OutFile $installer
+          $signature = Get-AuthenticodeSignature $installer
+          if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'O=Microsoft Corporation') {
+            throw "Refusing to run the installer: signature $($signature.Status), signer $($signature.SignerCertificate.Subject)"
+          }
+          Start-Process $installer -ArgumentList '/silent', '/install' -Wait
+          if (-not (Test-Path $key)) { throw 'WebView2 runtime is still missing after installing.' }
+          "WebView2 runtime installed: $((Get-ItemProperty $key).pv)"
+
       - name: Restore (locked)
         run: dotnet restore --locked-mode
 

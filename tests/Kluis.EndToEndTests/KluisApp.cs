@@ -148,7 +148,10 @@ public sealed class KluisApp : IAsyncDisposable
             await Task.Delay(250);
         }
 
-        throw new TimeoutException("WebView2 did not open its DevTools endpoint within 60 seconds.");
+        // The window title helps tell a hung start from an error dialog (for example a missing WebView2 runtime).
+        process.Refresh();
+        throw new TimeoutException(
+            $"WebView2 did not open its DevTools endpoint within 60 seconds. App window title: '{process.MainWindowTitle}'.");
     }
 
     private static int FreePort()
