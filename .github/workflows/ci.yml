@@ -40,6 +40,8 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
+      # End-to-end tests are excluded: on the GitHub-hosted Windows runner the app window opens but
+      # its WebView2 never starts, so they run locally before each release instead (see README).
       - name: Unit, component and integration tests
         run: dotnet test --configuration Release --no-build --filter "Category!=E2E" --logger "trx" --results-directory TestResults
 
@@ -51,51 +53,3 @@ jobs:
           path: TestResults
           retention-days: 7
 
-  e2e:
-    runs-on: windows-2025
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
-        with:
-          global-json-file: global.json
-
-      # The runner image ships Microsoft Edge but not the separate WebView2 runtime that BlazorWebView
-      # needs. Install Microsoft's Evergreen bootstrapper, refusing to run it unless it carries a valid
-      # Microsoft Authenticode signature: the download URL is not pinned, so the signature is the check.
-      - name: Install WebView2 runtime
-        shell: pwsh
-        run: |
-          $key = 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}'
-          if (Test-Path $key) { "WebView2 runtime already present: $((Get-ItemProperty $key).pv)"; exit 0 }
-          $installer = Join-Path $env:RUNNER_TEMP 'MicrosoftEdgeWebView2Setup.exe'
-          Invoke-WebRequest 'https://go.microsoft.com/fwlink/p/?LinkId=2124703' -OutFile $installer
-          $signature = Get-AuthenticodeSignature $installer
-          if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'O=Microsoft Corporation') {
-            throw "Refusing to run the installer: signature $($signature.Status), signer $($signature.SignerCertificate.Subject)"
-          }
-          Start-Process $installer -ArgumentList '/silent', '/install' -Wait
-          if (-not (Test-Path $key)) { throw 'WebView2 runtime is still missing after installing.' }
-          "WebView2 runtime installed: $((Get-ItemProperty $key).pv)"
-
-      - name: Restore (locked)
-        run: dotnet restore --locked-mode
-
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-
-      # Drives the real app window through WebView2. Playwright attaches to the WebView2 already
-      # inside the app, so no browser download is needed.
-      - name: End-to-end smoke tests
-        run: dotnet test tests/Kluis.EndToEndTests --configuration Release --no-build --filter "Category=E2E" --logger "trx" --results-directory TestResults
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: e2e-results
-          path: TestResults
-          retention-days: 7
