@@ -18,7 +18,7 @@ Inspired by local-first budgeting tools.
 
 ## Status
 
-Under construction. The app creates and unlocks its encrypted database; "remember on this PC" and the first installable pre-release arrive later in milestone M1 · Foundations.
+Early pre-release. The app installs, creates and unlocks its encrypted database, and can remember the passphrase on this PC. Statement import arrives in milestone M2.
 
 ## Build and test
 
@@ -61,7 +61,31 @@ The same checks run in GitHub Actions on every pull request and on every push to
 
 ## Install
 
-From the end of M1, installers are published on the GitHub Releases page of this repository. The installers are not code-signed, so Windows SmartScreen will show a "Windows protected your PC" warning on first run.
+Download `KluisApp-win-Setup.exe` from the [Releases page](https://github.com/Nerddio/kluis/releases) and run it. Requires Windows 10 version 1809 or later with the WebView2 runtime, which current Windows includes.
+
+What the installer does, plainly:
+
+- Installs the app for your Windows user only, no administrator rights, into `%LOCALAPPDATA%\KluisApp`, and adds a Start menu shortcut.
+- Your encrypted data is kept separately in `%LOCALAPPDATA%\Kluis`. Uninstalling removes `%LOCALAPPDATA%\KluisApp` and leaves your data in place; delete `%LOCALAPPDATA%\Kluis` yourself if you want it gone.
+- The app makes no network calls: no update check, no telemetry. New versions are installed by downloading the next installer.
+- The installer is not code-signed, so Windows SmartScreen shows "Windows protected your PC". Choose "More info", then "Run anyway". Signing costs money every year and is not in v1.
+
+## Releasing
+
+Every push to `main` builds and tests an installer in the Release workflow and keeps it as a build artefact for 30 days. Publishing a version is a deliberate step (Continuous Delivery):
+
+1. Tag the commit on `main` with a semantic version and push the tag: `git tag v0.2.0` then `git push origin v0.2.0`. Versions below 1.0.0, or with a suffix such as `-beta.1`, are marked as pre-releases.
+2. The Release workflow rebuilds nothing after its tests: it packs the installer once and attaches exactly those files to a **draft** release.
+3. The end-to-end smoke test cannot run on GitHub's runner (see the known gap above), so run it on your own desktop against that installer: download `KluisApp-win-Setup.exe` from the draft, install it, then run
+   `$env:KLUIS_APP_EXE = "$env:LOCALAPPDATA\KluisApp\current\Kluis.App.exe"; dotnet test tests/Kluis.EndToEndTests --filter "Category=E2E"`.
+   The test uses a throwaway database, never your real one.
+4. If it passes, publish the draft on GitHub. If it fails, delete the draft and the tag, fix, and tag again.
+
+## Rolling back a bad release
+
+- Mark the bad release as a pre-release on GitHub (or run `gh release edit v0.2.0 --prerelease`) so it is no longer shown as the latest. Fixing forward with a new patch release is the normal path.
+- The previous installer stays downloadable on the Releases page. Uninstall, then install the older version.
+- Database upgrades only move forward. If the bad version upgraded your database, restore the `kluis-<time>-before-migration.kluisbackup` file it wrote in `%LOCALAPPDATA%\Kluis` by renaming it to `kluis.db`, before opening the older version.
 
 ## Licence
 
