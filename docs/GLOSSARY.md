@@ -58,3 +58,11 @@ Terms used in this project, appended as they come up.
 - **DPAPI (Data Protection API)** — a Windows service that encrypts data with a key tied to the Windows user account (CurrentUser scope) or the machine, so an application can store a secret without managing a key itself.
 - **DPAPI optional entropy** — extra bytes an application mixes into DPAPI encryption; another program running as the same user must also supply them to decrypt, which stops generic decrypt-everything tools but is not a secret.
 - **Threat model** — who realistically might attack a system and what they would want; it decides which defences are worth their cost.
+- **End-to-end test (E2E)** — the whole system driven through its real user interface the way a user would; here, the real Kluis window driven by Playwright.
+- **Smoke test** — a shallow pass over every critical path, to catch a broken build or release quickly rather than to test edge cases.
+- **Critical path** — a user journey that, if broken, makes the product useless (for Kluis so far: create a database, then unlock it after a restart).
+- **Flaky test** — a test that sometimes passes and sometimes fails on the same code, usually because of timing; end-to-end tests are the most prone to it, which is why Playwright waits for conditions instead of fixed delays.
+- **Test trait (xUnit)** — a label on a test, such as `Category=E2E`, that a test run can filter on.
+- **Test pyramid** — the guideline to have many fast unit tests, fewer integration tests and only a few slow end-to-end tests; the testing trophy variant weights integration tests most heavily.
+- **Authenticode signature** — Windows code signing: a publisher signs an executable with a certificate, and Windows can verify who signed it and that it has not been changed since.
+- **WebView2 runtime** — the Windows component that BlazorWebView renders with; it ships with Windows 11 and is installed separately from the Edge browser.

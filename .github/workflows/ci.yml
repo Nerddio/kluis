@@ -13,13 +13,14 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
 jobs:
   build-and-test:
     runs-on: windows-2025
     timeout-minutes: 20
-    env:
-      DOTNET_NOLOGO: true
-      DOTNET_CLI_TELEMETRY_OPTOUT: true
     steps:
       # Third-party actions are pinned to a full commit SHA; the comment names the release it came from.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -39,8 +40,10 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
-      - name: Test
-        run: dotnet test --configuration Release --no-build --logger "trx" --results-directory TestResults
+      # End-to-end tests are excluded: on the GitHub-hosted Windows runner the app window opens but
+      # its WebView2 never starts, so they run locally before each release instead (see README).
+      - name: Unit, component and integration tests
+        run: dotnet test --configuration Release --no-build --filter "Category!=E2E" --logger "trx" --results-directory TestResults
 
       - name: Upload test results
         if: always()
@@ -49,3 +52,4 @@ jobs:
           name: test-results
           path: TestResults
           retention-days: 7
+

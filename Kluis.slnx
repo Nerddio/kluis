@@ -7,6 +7,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Kluis.Core.Tests/Kluis.Core.Tests.csproj" />
+    <Project Path="tests/Kluis.EndToEndTests/Kluis.EndToEndTests.csproj" />
     <Project Path="tests/Kluis.IntegrationTests/Kluis.IntegrationTests.csproj" />
     <Project Path="tests/Kluis.UI.Tests/Kluis.UI.Tests.csproj" />
   </Folder>
